@@ -14,12 +14,16 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include "common/initialization.hpp"
+#include "paramLoad/LivoxConfig.h"
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   std::string installPath;
   std::string configPath;
-  Common::Init::GetInstallPath(installPath);
-  Common::Init::GetConfigPath(configPath);
+  bool isGetInstallPath = Common::Init::GetInstallPath(installPath);
+  if (!isGetInstallPath) {
+    return -1;
+  }
+  configPath = Common::Init::GetConfigPath(installPath);
 
   google::InitGoogleLogging(argv[0]);
   google::InstallFailureSignalHandler();
@@ -29,5 +33,15 @@ int main(int argc, char **argv) {
   FLAGS_colorlogtostderr = true;
   LOG(INFO) << "multi_livox_merge Log Init Success!";
 
+  rclcpp::InitOptions rcl_options;
+  rcl_options.auto_initialize_logging(false);
+  rclcpp::init(argc, argv, rcl_options);
+
+  // TODO
+  auto livox_config = paramLoad::LivoxConfig::GetInstance();
+  livox_config->SetConfigFilePath(configPath);
+  livox_config->LoadConfig();
+
+  rclcpp::shutdown();
   return 0;
 }

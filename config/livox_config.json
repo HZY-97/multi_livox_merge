@@ -1,4 +1,8 @@
 {
+    "working_mode": {
+        "commant": "0:merge point cloud; 1:Calibrate all data to laserId 0 ",
+        "mode": 1
+    },
     "use_lidar_id": [
         0,
         1
@@ -6,7 +10,7 @@
     "use_imu_id": [
         0
     ],
-    "mid-360": [
+    "mid_360": [
         {
             "id": 0,
             "name": "front lidar",
