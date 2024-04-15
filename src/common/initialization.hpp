@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef COMMON_INITIALIZATION_HPP
-#define COMMON_INITIALIZATION_HPP
+#ifndef SRC_COMMON_INITIALIZATION_HPP
+#define SRC_COMMON_INITIALIZATION_HPP
 #include <unistd.h>
 
 #include <iostream>

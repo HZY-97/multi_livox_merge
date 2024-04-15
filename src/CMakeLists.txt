@@ -1,6 +1,7 @@
 
 set(src
-Node.cpp
+    Node.cpp
+    paramLoad/LivoxConfig.cpp
 )
 
 include_directories(
