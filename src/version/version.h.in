@@ -1,0 +1,10 @@
+#ifndef SRC_VERSION_VERSION_H
+#define SRC_VERSION_VERSION_H
+
+// clang-format off
+#define multi_livox_merge_VERSION_MAJOR @multi_livox_merge_MAJOR_VERSION@
+#define multi_livox_merge_VERSION_MINOR @multi_livox_merge_MINOR_VERSION@
+#define multi_livox_merge_VERSION_PATCH @multi_livox_merge_PATCH_VERSION@
+// clang-format on
+
+#endif // SRC_VERSION_VERSION_H
