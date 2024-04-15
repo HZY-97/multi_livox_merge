@@ -1,0 +1,9 @@
+/build
+/.vscode
+*.tags*
+/install
+/log
+/3dNavBlackBox
+*.kdev*
+/.idea
+/.cache

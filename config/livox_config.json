@@ -1,0 +1,35 @@
+{
+    "use_lidar_id": [
+        0,
+        1
+    ],
+    "use_imu_id": [
+        0
+    ],
+    "mid-360": [
+        {
+            "id": 0,
+            "name": "front lidar",
+            "ip": "192.168.3.110",
+            "commant": "x/y/z metre; roll/pitch/yaw degree",
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "roll": 0.0,
+            "pitch": 0.0,
+            "yaw": 0.0
+        },
+        {
+            "id": 1,
+            "name": "back lidar",
+            "ip": "192.168.3.111",
+            "commant": "x/y/z metre; roll/pitch/yaw degree",
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "roll": 0.0,
+            "pitch": 0.0,
+            "yaw": 0.0
+        }
+    ]
+}
