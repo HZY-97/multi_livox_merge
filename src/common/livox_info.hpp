@@ -66,6 +66,20 @@ class LivoxInfo {
     this->yaw = other.yaw;
   }
 
+  LivoxInfo &operator=(const LivoxInfo &other) {
+    if (this != &other) {
+      this->id = other.id;
+      this->ip = other.ip;
+      this->x = other.x;
+      this->y = other.y;
+      this->z = other.z;
+      this->roll = other.roll;
+      this->pitch = other.pitch;
+      this->yaw = other.yaw;
+    }
+    return *this;
+  }
+
   ~LivoxInfo() {
   }
 
@@ -74,6 +88,18 @@ class LivoxInfo {
            "\nx:" + std::to_string(x) + " y:" + std::to_string(y) +
            " z:" + std::to_string(z) + "\nroll:" + std::to_string(roll) +
            " pitch:" + std::to_string(pitch) + " yaw:" + std::to_string(yaw);
+  }
+
+  void ToDegree() {
+    roll = roll * 180.0f / M_PI;
+    pitch = pitch * 180.0f / M_PI;
+    yaw = yaw * 180.0f / M_PI;
+  }
+
+  void ToRadian() {
+    roll = roll * M_PI / 180.0f;
+    pitch = pitch * M_PI / 180.0f;
+    yaw = yaw * M_PI / 180.0f;
   }
 
  public:
@@ -87,6 +113,8 @@ class LivoxInfo {
   float roll;
   float pitch;
   float yaw;
+
+ private:
 };
 }  // namespace Type
 }  // namespace Common

@@ -5,6 +5,8 @@
 
 #include <glog/logging.h>
 
+#include <algorithm>
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <mutex>
@@ -36,11 +38,15 @@ class LivoxConfig final {
  private:
   LivoxConfig();
 
+  string ReplaceIpDotsWithUnderscores(const string& ip);
+
  public:
   int mode;
   vector<int> use_lidar_id;
   vector<int> use_imu_id;
   vector<Common::Type::LivoxInfo> m_livoxInfoVec;
+
+  bool save_pcd;
 
  private:
   string m_configPath;
