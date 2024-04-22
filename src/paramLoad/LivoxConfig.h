@@ -46,6 +46,8 @@ class LivoxConfig final {
   vector<int> use_imu_id;
   vector<Common::Type::LivoxInfo> m_livoxInfoVec;
 
+  bool save_pcd;
+
  private:
   string m_configPath;
   static LivoxConfig* livoxConfigPtr;

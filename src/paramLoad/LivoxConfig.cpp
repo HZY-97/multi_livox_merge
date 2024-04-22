@@ -92,6 +92,8 @@ void LivoxConfig::LoadConfig() {
                 return info1.id < info2.id;
               });
 
+    save_pcd = livox_config_json["calibration"]["save_pcd"].get<bool>();
+
   } catch (const nlohmann::json::exception& e) {
     std::cerr << "\033[31m" << e.what() << "\033[0m" << '\n';
   }

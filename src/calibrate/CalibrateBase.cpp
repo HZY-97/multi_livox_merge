@@ -12,14 +12,18 @@
 
 #include <cstdlib>
 
+#include "paramLoad/LivoxConfig.h"
+
 namespace calibrate {
 CalibrateBase::CalibrateBase() {
-  Common::Init::GetInstallPath(m_saveCaliedPcdPath);
-  m_saveCaliedPcdPath = m_saveCaliedPcdPath + "/CaliedPcd/";
-  std::string command = "rm -rf " + m_saveCaliedPcdPath;
-  system(command.c_str());
-  command = "mkdir -p " + m_saveCaliedPcdPath;
-  system(command.c_str());
+  if (paramLoad::LivoxConfig::GetInstance()->save_pcd) {
+    Common::Init::GetInstallPath(m_saveCaliedPcdPath);
+    m_saveCaliedPcdPath = m_saveCaliedPcdPath + "/CaliedPcd/";
+    std::string command = "rm -rf " + m_saveCaliedPcdPath;
+    system(command.c_str());
+    command = "mkdir -p " + m_saveCaliedPcdPath;
+    system(command.c_str());
+  }
 }
 
 CalibrateBase::~CalibrateBase() {

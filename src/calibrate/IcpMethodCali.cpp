@@ -80,20 +80,23 @@ Result IcpMethodCali::Exectute() {
     LOG(INFO) << "average distance = " << icp.getFitnessScore();
     pcl::getTranslationAndEulerAngles(correctionLidarFrame, r.x, r.y, r.z,
                                       r.roll, r.pitch, r.yaw);
-    std::string save_times_pcd = m_saveCaliedPcdPath + std::to_string(times);
-    std::string command = "mkdir -p " + save_times_pcd;
-    system(command.c_str());
-    pcl::io::savePCDFileASCII(
-        save_times_pcd + "/" + std::to_string(times) + "_source.pcd",
-        *source_cloud);
-    pcl::io::savePCDFileASCII(
-        save_times_pcd + "/" + std::to_string(times) + "_target.pcd",
-        *target_cloud);
-    *transformed_source = *target_cloud + *transformed_source;
-    pcl::io::savePCDFileASCII(
-        save_times_pcd + "/" + std::to_string(times) + ".pcd",
-        *transformed_source);
-    times += 1;
+
+    if (paramLoad::LivoxConfig::GetInstance()->save_pcd) {
+      std::string save_times_pcd = m_saveCaliedPcdPath + std::to_string(times);
+      std::string command = "mkdir -p " + save_times_pcd;
+      system(command.c_str());
+      pcl::io::savePCDFileASCII(
+          save_times_pcd + "/" + std::to_string(times) + "_source.pcd",
+          *source_cloud);
+      pcl::io::savePCDFileASCII(
+          save_times_pcd + "/" + std::to_string(times) + "_target.pcd",
+          *target_cloud);
+      *transformed_source = *target_cloud + *transformed_source;
+      pcl::io::savePCDFileASCII(
+          save_times_pcd + "/" + std::to_string(times) + ".pcd",
+          *transformed_source);
+      times += 1;
+    }
     r.x = m_lastResult.x + r.x;
     r.y = m_lastResult.y + r.y;
     r.z = m_lastResult.z + r.z;
