@@ -1,8 +1,4 @@
-
-set(src
-    Node.cpp
-    paramLoad/LivoxConfig.cpp
-)
+file(GLOB_RECURSE src "./*.cpp")
 
 include_directories(
     .
@@ -12,6 +8,9 @@ add_executable(${PROJECT_NAME} ${src})
 
 target_link_libraries(${PROJECT_NAME}
     ${rclcpp_LIBRARIES}
+    ${PCL_LIBRARIES}
+    ${sensor_msgs_LIBRARIES}
+    ${livox_ros_driver2_LIBRARIES}
     OpenMP::OpenMP_CXX
     glog
 )

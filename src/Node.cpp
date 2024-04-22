@@ -11,9 +11,11 @@
 
 #include <glog/logging.h>
 
+#include <chrono>
 #include <rclcpp/rclcpp.hpp>
 
 #include "common/initialization.hpp"
+#include "manager/NodeManager.h"
 #include "paramLoad/LivoxConfig.h"
 
 int main(int argc, char** argv) {
@@ -37,10 +39,28 @@ int main(int argc, char** argv) {
   rcl_options.auto_initialize_logging(false);
   rclcpp::init(argc, argv, rcl_options);
 
-  // TODO
   auto livox_config = paramLoad::LivoxConfig::GetInstance();
   livox_config->SetConfigFilePath(configPath);
   livox_config->LoadConfig();
+
+  auto node_manager_ptr = manager::NodeManager::GetInstance();
+  node_manager_ptr->CreateTopicManager();
+  node_manager_ptr->CreateProcess();
+  std::thread t = std::thread([&]() {
+    while (true) {
+      auto r = node_manager_ptr->m_caliPtr->Exectute();
+      if (r.x != 0.0f && r.y != 0.0f && r.z != 0.0f && r.roll != 0.0f &&
+          r.pitch != 0.0f && r.yaw != 0.0f) {
+        std::cout << r.ShowResult() << std::endl;
+      } else {
+        LOG_EVERY_N(INFO, 50) << "Waiting for calculation...";
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+  });
+
+  node_manager_ptr->Spin();
+  t.join();
 
   rclcpp::shutdown();
   return 0;
