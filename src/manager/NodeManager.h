@@ -12,13 +12,14 @@
 #define NODEMANAGER_H
 
 #pragma once
-
 #include <memory>
 #include <mutex>
 #include <rclcpp/rclcpp.hpp>
 
 #include "calibrate/IcpMethodCali.h"
 #include "manager/TopicManager.h"
+#include "merge/LidarMerge.h"
+#include "paramLoad/LivoxConfig.h"
 
 using std::mutex;
 
@@ -44,12 +45,13 @@ class NodeManager {
   std::shared_ptr<TopicManager> m_topicManagerPtr;
   std::shared_ptr<calibrate::CalibrateBase> m_caliPtr;
 
+  std::shared_ptr<merge::LidarMerge> m_mergePtr;
+
  private:
   static NodeManager* livoxConfigPtr;
   static mutex livoxConfigPtrMtx;
 
   rclcpp::NodeOptions m_options;
-  rclcpp::executors::MultiThreadedExecutor m_exec;
 };
 }  // namespace manager
 

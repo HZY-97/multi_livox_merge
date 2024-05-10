@@ -1,7 +1,8 @@
 {
+    "save_pcd": false,
     "working_mode": {
         "commant": "0:merge point cloud; 1:Calibrate all data to laserId 0 ",
-        "mode": 1
+        "mode": 0
     },
     "use_lidar_id": [
         0,
@@ -28,15 +29,12 @@
             "name": "back lidar",
             "ip": "192.168.3.111",
             "commant": "x/y/z metre; roll/pitch/yaw degree",
-            "x": 2.4,
-            "y": -1.0,
+            "x": 0.0,
+            "y": 0.0,
             "z": 0.0,
             "roll": 0.0,
             "pitch": 0.0,
             "yaw": 0.0
         }
-    ],
-    "calibration": {
-        "save_pcd": true
-    }
+    ]
 }

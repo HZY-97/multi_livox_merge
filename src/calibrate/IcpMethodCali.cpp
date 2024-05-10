@@ -14,6 +14,7 @@
 #include <pcl/kdtree/kdtree_flann.h>
 
 #include <algorithm>
+#include <mutex>
 #include <pcl/impl/point_types.hpp>
 #include <string>
 
@@ -186,22 +187,24 @@ void IcpMethodCali::FindCoView(
   std::vector<int> s_idx_total_vec;
   std::vector<int> t_idx_total_vec;
 
-  std::vector<int> s_idx_vec;
-  std::vector<int> t_idx_vec;
-
-  std::vector<float> s_distance_vec;
-  std::vector<float> t_distance_vec;
+  std::mutex s_idx_total_vec_mtx;
+  std::mutex t_idx_total_vec_mtx;
 
   std::thread s_t;
   std::thread t_t;
 
-  double radius = 20;
+  double radius = 0.1;
 
   s_t = std::thread([&]() {
     s_kdtree->setInputCloud(source_cloud);
+#pragma omp parallel for num_threads(8)
     for (size_t i = 0; i < target_cloud->size(); i++) {
-      s_kdtree->nearestKSearch(target_cloud->points[i], radius, s_idx_vec,
-                               s_distance_vec);
+      std::vector<int> s_idx_vec(source_cloud->size());
+      std::vector<float> s_distance_vec(source_cloud->size());
+      s_kdtree->radiusSearch(target_cloud->points[i], radius, s_idx_vec,
+                             s_distance_vec);
+
+      std::lock_guard<std::mutex> lock_s(s_idx_total_vec_mtx);
       std::copy(s_idx_vec.begin(), s_idx_vec.end(),
                 std::back_inserter(s_idx_total_vec));
     }
@@ -217,9 +220,14 @@ void IcpMethodCali::FindCoView(
 
   t_t = std::thread([&]() {
     t_kdtree->setInputCloud(target_cloud);
+#pragma omp parallel for num_threads(8)
     for (size_t i = 0; i < source_cloud->size(); i++) {
-      t_kdtree->nearestKSearch(source_cloud->points[i], radius, t_idx_vec,
-                               t_distance_vec);
+      std::vector<int> t_idx_vec(target_cloud->size());
+      std::vector<float> t_distance_vec(target_cloud->size());
+      t_kdtree->radiusSearch(source_cloud->points[i], radius, t_idx_vec,
+                             t_distance_vec);
+
+      std::lock_guard<std::mutex> lock_t(t_idx_total_vec_mtx);
       std::copy(t_idx_vec.begin(), t_idx_vec.end(),
                 std::back_inserter(t_idx_total_vec));
     }

@@ -41,6 +41,8 @@ void TopicManager::InitTopic() {
       Create_1_sub_merge(livoxInfoVec);
     } else if (livoxInfoVec.size() == 2) {
       Create_2_sub_merge(livoxInfoVec);
+      m_mergeLivox = create_publisher<livox_ros_driver2::msg::CustomMsg>(
+          "/livox/lidar", 5);
     }
 
   } else if (1 == mode) {
@@ -102,14 +104,14 @@ void TopicManager::Create_2_sub_merge(
 
 void TopicManager::TMCloudHandlerLivox_0_merge(
     const livox_ros_driver2::msg::CustomMsg::SharedPtr laserCloudMsg_0) {
-  double ms = laserCloudMsg_0->header.stamp.nanosec / 1000.0;
-  LOG(INFO) << "000==" << ms;
+  double ms = laserCloudMsg_0->header.stamp.nanosec / 1000000.0;
+  DataManager::GetInstance()->SaveCaliData(0, laserCloudMsg_0);
 }
 
 void TopicManager::TMCloudHandlerLivox_1_merge(
     const livox_ros_driver2::msg::CustomMsg::SharedPtr laserCloudMsg_1) {
-  double ms = laserCloudMsg_1->header.stamp.nanosec / 1000.0;
-  LOG(INFO) << "111==" << ms;
+  double ms = laserCloudMsg_1->header.stamp.nanosec / 1000000.0;
+  DataManager::GetInstance()->SaveCaliData(1, laserCloudMsg_1);
 }
 
 void TopicManager::Create_2_sub_calibrate(

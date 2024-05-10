@@ -10,8 +10,6 @@
  */
 #include "NodeManager.h"
 
-#include "paramLoad/LivoxConfig.h"
-
 namespace manager {
 
 NodeManager* NodeManager::livoxConfigPtr = nullptr;
@@ -43,7 +41,6 @@ void NodeManager::CreateTopicManager() {
   if (m_topicManagerPtr == nullptr) {
     m_topicManagerPtr =
         std::make_shared<TopicManager>("multi_livox_merge", m_options);
-    m_exec.add_node(m_topicManagerPtr);
   }
 }
 
@@ -52,12 +49,16 @@ void NodeManager::CreateProcess() {
     if (m_caliPtr == nullptr) {
       m_caliPtr = std::make_shared<calibrate::IcpMethodCali>();
     }
+  } else if (paramLoad::LivoxConfig::GetInstance()->mode == 0) {
+    if (m_mergePtr == nullptr) {
+      m_mergePtr = std::make_shared<merge::LidarMerge>();
+    }
   }
 }
 
 void NodeManager::Spin() {
   LOG(INFO) << "NodeManager spin";
-  m_exec.spin();
+  rclcpp::spin(m_topicManagerPtr);
 }
 
 }  // namespace manager
