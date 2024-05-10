@@ -45,22 +45,35 @@ int main(int argc, char** argv) {
 
   auto node_manager_ptr = manager::NodeManager::GetInstance();
   node_manager_ptr->CreateTopicManager();
-  node_manager_ptr->CreateProcess();
-  std::thread t = std::thread([&]() {
-    while (true) {
-      auto r = node_manager_ptr->m_caliPtr->Exectute();
-      if (r.x != 0.0f && r.y != 0.0f && r.z != 0.0f && r.roll != 0.0f &&
-          r.pitch != 0.0f && r.yaw != 0.0f) {
-        std::cout << r.ShowResult() << std::endl;
-      } else {
-        LOG_EVERY_N(INFO, 50) << "Waiting for calculation...";
+  if (paramLoad::LivoxConfig::GetInstance()->mode == 1) {
+    node_manager_ptr->CreateProcess();
+    std::thread t = std::thread([&]() {
+      while (true) {
+        auto r = node_manager_ptr->m_caliPtr->Exectute();
+        if (r.x != 0.0f && r.y != 0.0f && r.z != 0.0f && r.roll != 0.0f &&
+            r.pitch != 0.0f && r.yaw != 0.0f) {
+          std::cout << r.ShowResult() << std::endl;
+        } else {
+          LOG_EVERY_N(INFO, 50) << "Waiting for calculation...";
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
       }
-      std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    }
-  });
+    });
 
-  node_manager_ptr->Spin();
-  t.join();
+    node_manager_ptr->Spin();
+    t.join();
+  } else if (paramLoad::LivoxConfig::GetInstance()->mode == 0) {
+    node_manager_ptr->CreateProcess();
+    std::thread t = std::thread([&]() {
+      while (true) {
+        node_manager_ptr->m_mergePtr->MergeCloud();
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      }
+    });
+
+    node_manager_ptr->Spin();
+    t.join();
+  }
 
   rclcpp::shutdown();
   return 0;

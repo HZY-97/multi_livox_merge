@@ -2,17 +2,17 @@ cmake_minimum_required(VERSION 3.8)
 project(multi_livox_merge)
 
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/install)
-set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -pthread")
-# set(CMAKE_BUILD_TYPE "Debug")
-# set(CMAKE_CXX_FLAGS "-O0 -Wall -Wextra -g -pthread")
+# set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -pthread")
+set(CMAKE_BUILD_TYPE "Debug")
+set(CMAKE_CXX_FLAGS "-O0 -Wall -Wextra -g -pthread")
 set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(${PROJECT_NAME}_MAJOR_VERSION 0)
 set(${PROJECT_NAME}_MINOR_VERSION 0)
-set(${PROJECT_NAME}_PATCH_VERSION 1)
+set(${PROJECT_NAME}_PATCH_VERSION 4)
 set(${PROJECT_NAME}_VERSION
   ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
 
