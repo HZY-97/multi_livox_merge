@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     std::thread t = std::thread([&]() {
       while (true) {
         node_manager_ptr->m_mergePtr->MergeCloud();
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
       }
     });
 

@@ -19,11 +19,32 @@ LidarMerge::LidarMerge() {
 LidarMerge::~LidarMerge() {
 }
 
+void LidarMerge::GetFrequency() {
+  static bool isFirst = true;
+  if (isFirst) {
+    last_publish_time = current_time;
+    return;
+  } else {
+    std::chrono::duration<double> time_span =
+        std::chrono::duration_cast<std::chrono::duration<double>>(
+            current_time - last_publish_time);
+
+    // 输出周期（秒）
+    double period_seconds = time_span.count();
+    LOG(INFO) << "发布周期: " << period_seconds << " 秒";
+
+    // 计算频率（Hz）
+    double frequency_hz = 1.0 / period_seconds;
+    LOG(INFO) << "发布频率: " << frequency_hz << " Hz";
+  }
+}
+
 void LidarMerge::MergeCloud() {
   if (!SyncCloud()) {
     return;
   }
   PubMeergeCloud();
+  GetFrequency();
 }
 
 bool LidarMerge::SyncCloud() {
@@ -54,6 +75,7 @@ bool LidarMerge::SyncCloud() {
   }
   cloud_0_ptr = tmp_cloud_0_ptr;
   cloud_1_ptr = tmp_cloud_1_ptr;
+  current_time = std::chrono::steady_clock::now();
   return true;
 }
 
