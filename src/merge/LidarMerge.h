@@ -5,6 +5,7 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_cloud.h>
 
+#include <atomic>
 #include <deque>
 #include <pcl/impl/point_types.hpp>
 #include <std_msgs/msg/header.hpp>
@@ -22,22 +23,28 @@ class LidarMerge {
 
  private:
   bool SyncCloud();
-  uint8_t CheckHeader(std_msgs::msg::Header header_0,
-                      std_msgs::msg::Header header_1);
+  uint8_t CheckTime(double time_0_ms, double time_1_ms);
 
   void PubMeergeCloud();
 
-  void GetFrequency();
-
  public:
  private:
+  manager::DataManager* m_dataManager;
+
   livox_ros_driver2::msg::CustomMsg::SharedPtr cloud_0_ptr;
   livox_ros_driver2::msg::CustomMsg::SharedPtr cloud_1_ptr;
 
-  std::chrono::steady_clock::time_point current_time;
-  std::chrono::steady_clock::time_point last_publish_time;
-
   std::string m_saveMergePcdPath;
+
+  livox_ros_driver2::msg::CustomMsg::SharedPtr tmp_cloud_0_ptr;
+  livox_ros_driver2::msg::CustomMsg::SharedPtr tmp_cloud_1_ptr;
+
+  std::atomic<bool> is_sync;
+
+#ifdef SHOW_TIME
+  std::chrono::system_clock::time_point m_lastTime;
+  std::chrono::system_clock::time_point m_currentTime;
+#endif
 };
 
 }  // namespace merge

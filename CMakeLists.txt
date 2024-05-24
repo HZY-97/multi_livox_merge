@@ -12,11 +12,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(${PROJECT_NAME}_MAJOR_VERSION 0)
 set(${PROJECT_NAME}_MINOR_VERSION 0)
-set(${PROJECT_NAME}_PATCH_VERSION 5)
+set(${PROJECT_NAME}_PATCH_VERSION 6)
 set(${PROJECT_NAME}_VERSION
   ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
 
 option(BUILD_WITH_CCACHE "Build with ccache" OFF)
+option(SHOW_TIME "show merge and pub time" ON)
+
 if(NOT MSVC AND NOT XCODE_VERSION)
     find_program(CCACHE_FOUND ccache)
     if(CCACHE_FOUND)
@@ -27,6 +29,10 @@ if(NOT MSVC AND NOT XCODE_VERSION)
         set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
         endif()
     endif(CCACHE_FOUND)
+endif()
+
+if(SHOW_TIME)
+  add_definitions(-DSHOW_TIME)
 endif()
 
 find_package(livox_ros_driver2 REQUIRED)

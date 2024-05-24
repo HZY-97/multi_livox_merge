@@ -37,9 +37,9 @@ class TopicManager : public rclcpp::Node {
   void InitTopic();
 
   void TMCloudHandlerLivox_0_merge(
-      const livox_ros_driver2::msg::CustomMsg::SharedPtr laserCloudMsg_0);
+      livox_ros_driver2::msg::CustomMsg::SharedPtr laserCloudMsg_0);
   void TMCloudHandlerLivox_1_merge(
-      const livox_ros_driver2::msg::CustomMsg::SharedPtr laserCloudMsg_1);
+      livox_ros_driver2::msg::CustomMsg::SharedPtr laserCloudMsg_1);
 
   void TMCloudHandlerLivox_0_calibrate(
       const livox_ros_driver2::msg::CustomMsg::SharedPtr laserCloudMsg_0);

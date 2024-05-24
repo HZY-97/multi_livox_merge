@@ -15,7 +15,7 @@
         {
             "id": 0,
             "name": "front lidar",
-            "ip": "192.168.3.110",
+            "ip": "192.168.3.111",
             "commant": "x/y/z metre; roll/pitch/yaw degree",
             "x": 0.0,
             "y": 0.0,
@@ -27,7 +27,7 @@
         {
             "id": 1,
             "name": "back lidar",
-            "ip": "192.168.3.111",
+            "ip": "192.168.3.110",
             "commant": "x/y/z metre; roll/pitch/yaw degree",
             "x": 0.0,
             "y": 0.0,
