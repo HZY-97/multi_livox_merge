@@ -42,13 +42,12 @@ class DataManager {
  public:
   std::deque<livox_ros_driver2::msg::CustomMsg::SharedPtr> m_caliData_0_deq;
   std::deque<livox_ros_driver2::msg::CustomMsg::SharedPtr> m_caliData_1_deq;
+  std::mutex m_caliData_0_deq_Mtx;
+  std::mutex m_caliData_1_deq_Mtx;
 
  private:
   static DataManager* m_dataManagerPtr;
   static std::mutex m_mutex;
-
-  std::mutex m_caliData_0_deq_Mtx;
-  std::mutex m_caliData_1_deq_Mtx;
 };
 
 }  // namespace manager

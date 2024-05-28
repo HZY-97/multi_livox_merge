@@ -53,80 +53,38 @@ void LidarMerge::MergeCloud() {
 }
 
 bool LidarMerge::SyncCloud() {
-  if (nullptr == tmp_cloud_0_ptr) {
-    tmp_cloud_0_ptr = m_dataManager->GetFrontMsg(0);
-  }
+  std::lock_guard<std::mutex> lock0(m_dataManager->m_caliData_0_deq_Mtx);
+  std::lock_guard<std::mutex> lock1(m_dataManager->m_caliData_1_deq_Mtx);
 
-  if (nullptr == tmp_cloud_1_ptr) {
-    tmp_cloud_1_ptr = m_dataManager->GetFrontMsg(1);
-  }
+  while (!m_dataManager->m_caliData_0_deq.empty() &&
+         !m_dataManager->m_caliData_1_deq.empty()) {
+    tmp_cloud_0_ptr = m_dataManager->m_caliData_0_deq.front();
+    tmp_cloud_1_ptr = m_dataManager->m_caliData_1_deq.front();
 
-  if (tmp_cloud_0_ptr == nullptr || tmp_cloud_1_ptr == nullptr) {
-    // LOG(ERROR) << "No cloud";
-    return false;
-  }
+    double time_diff = (tmp_cloud_0_ptr->header.stamp.sec * 1000.0 +
+                        tmp_cloud_0_ptr->header.stamp.nanosec / 1000000.0) -
+                       (tmp_cloud_1_ptr->header.stamp.sec * 1000.0 +
+                        tmp_cloud_1_ptr->header.stamp.nanosec / 1000000.0);
+    LOG(INFO) << "time_diff 0-1= " << time_diff;
+    if (std::abs(time_diff) < 50.0) {
+      cloud_0_ptr = tmp_cloud_0_ptr;
+      cloud_1_ptr = tmp_cloud_1_ptr;
 
-  is_sync.store(false);
-
-  while (!is_sync.load()) {
-    auto header_0 = tmp_cloud_0_ptr->header;
-    auto header_1 = tmp_cloud_1_ptr->header;
-
-    double time_ms_0 =
-        header_0.stamp.sec * 1000.0 + header_0.stamp.nanosec / 1000000.0;
-    double time_ms_1 =
-        header_1.stamp.sec * 1000.0 + header_1.stamp.nanosec / 1000000.0;
-
-    LOG(INFO) << "time_ms_0= " << time_ms_0;
-    LOG(INFO) << "time_ms_1= " << time_ms_1;
-    LOG(INFO) << "time_diff 0-1 = " << time_ms_0 - time_ms_1;
-    if (CheckTime(time_ms_0, time_ms_1) == 1) {
-      // LOG(WARNING) << "wait sync id:1";
-      LOG_FIRST_N(INFO, 15) << "wait sync id:1";
-      tmp_cloud_1_ptr.reset();
-      while (tmp_cloud_1_ptr == nullptr) {
-        tmp_cloud_1_ptr = m_dataManager->GetFrontMsg(0);
-      }
-    } else if (CheckTime(time_ms_0, time_ms_1) == 0) {
-      // LOG(WARNING) << "wait sync id:0";
-      LOG_FIRST_N(INFO, 15) << "wait sync id:0";
-      tmp_cloud_0_ptr.reset();
-      while (tmp_cloud_0_ptr == nullptr) {
-        tmp_cloud_0_ptr = m_dataManager->GetFrontMsg(0);
-      }
-    } else if (CheckTime(time_ms_0, time_ms_1) == 100) {
-      is_sync.store(true);
+      m_dataManager->m_caliData_0_deq.pop_front();
+      m_dataManager->m_caliData_1_deq.pop_front();
+      return true;
     } else {
-      LOG(ERROR) << "reset all cloud";
-      tmp_cloud_0_ptr.reset();
-      tmp_cloud_1_ptr.reset();
-      is_sync.store(true);
-      return false;
+      if (time_diff > 0) {
+        LOG(ERROR) << "id:1 is old wait...";
+        m_dataManager->m_caliData_1_deq.pop_front();
+      } else {
+        LOG(ERROR) << "id:0 is old wait...";
+        m_dataManager->m_caliData_0_deq.pop_front();
+      }
     }
   }
-  cloud_0_ptr = tmp_cloud_0_ptr;
-  cloud_1_ptr = tmp_cloud_1_ptr;
 
-  return true;
-}
-
-uint8_t LidarMerge::CheckTime(double time_0_ms, double time_1_ms) {
-  double time_diff = time_0_ms - time_1_ms;
-  if (std::abs(time_diff) < 50.0) {
-    // sync ok
-    return 100;
-  } else if (time_diff >= 100.0 && time_diff <= 300.0) {
-    // 1 is old
-    LOG(WARNING) << " 1 is old time_diff = " << time_diff;
-    return 1;
-  } else if (time_diff <= -100.0 && time_diff >= -300.0) {
-    // 0 is old
-    LOG(WARNING) << " 0 is old time_diff = " << time_diff;
-    return 0;
-  } else {
-    LOG(ERROR) << "time_diff = " << time_diff;
-    return 231;
-  }
+  return false;
 }
 
 void LidarMerge::PubMeergeCloud() {
@@ -146,16 +104,26 @@ void LidarMerge::PubMeergeCloud() {
   manager::NodeManager::GetInstance()->m_topicManagerPtr->m_mergeLivox->publish(
       *full_cloud_ptr);
 
+  pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_full_cloud(
+      new pcl::PointCloud<pcl::PointXYZI>);
   if (paramLoad::LivoxConfig::GetInstance()->save_pcd) {
-    pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_full_cloud(
-        new pcl::PointCloud<pcl::PointXYZI>);
     for (size_t i = 0; i < full_cloud_ptr->points.size(); i++) {
       pcl_full_cloud->points.push_back(pcl::PointXYZI(
           full_cloud_ptr->points[i].x, full_cloud_ptr->points[i].y,
           full_cloud_ptr->points[i].z, full_cloud_ptr->points[i].reflectivity));
     }
-
     pcl::io::savePCDFileBinary(m_saveMergePcdPath + "0.pcd", *pcl_full_cloud);
+  }
+  if (manager::NodeManager::GetInstance()
+          ->m_topicManagerPtr->m_showMergeLivox->get_subscription_count() !=
+      0) {
+    auto pub_show = manager::NodeManager::GetInstance()
+                        ->m_topicManagerPtr->m_showMergeLivox;
+    sensor_msgs::msg::PointCloud2 tmpCloud;
+
+    pcl::toROSMsg(*pcl_full_cloud, tmpCloud);
+    tmpCloud.header.frame_id = "map";
+    pub_show->publish(tmpCloud);
   }
 
   full_cloud_ptr.reset();

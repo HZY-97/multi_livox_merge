@@ -12,6 +12,7 @@
 #ifndef SRC_MANAGER_TOPIC_MANAGER_H
 #define SRC_MANAGER_TOPIC_MANAGER_H
 
+#include <sensor_msgs/msg/detail/point_cloud2__struct.hpp>
 #pragma once
 
 #include <rclcpp/rclcpp.hpp>
@@ -53,6 +54,7 @@ class TopicManager : public rclcpp::Node {
 
  public:
   rclcpp::Publisher<livox_ros_driver2::msg::CustomMsg>::SharedPtr m_mergeLivox;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr m_showMergeLivox;
 
  private:
   vector<rclcpp::Subscription<livox_ros_driver2::msg::CustomMsg>::SharedPtr>

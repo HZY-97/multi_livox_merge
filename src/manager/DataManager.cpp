@@ -52,9 +52,6 @@ livox_ros_driver2::msg::CustomMsg::SharedPtr DataManager::GetFrontMsg(
     if (m_caliData_0_deq.size() > 0) {
       auto cloud = m_caliData_0_deq.front();
       m_caliData_0_deq.pop_front();
-      if (!m_caliData_0_deq.empty()) {
-        m_caliData_0_deq.clear();
-      }
       return cloud;
     }
   } else if (1 == lidar_id) {
@@ -62,9 +59,6 @@ livox_ros_driver2::msg::CustomMsg::SharedPtr DataManager::GetFrontMsg(
     if (m_caliData_1_deq.size() > 0) {
       auto cloud = m_caliData_1_deq.front();
       m_caliData_1_deq.pop_front();
-      if (!m_caliData_1_deq.empty()) {
-        m_caliData_1_deq.clear();
-      }
       return cloud;
     }
   } else {

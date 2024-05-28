@@ -12,6 +12,7 @@
 #include "manager/TopicManager.h"
 
 #include <rclcpp/clock.hpp>
+#include <sensor_msgs/msg/detail/point_cloud2__struct.hpp>
 #include <string>
 
 using paramLoad::LivoxConfig;
@@ -50,6 +51,8 @@ void TopicManager::InitTopic() {
       Create_2_sub_merge(livoxInfoVec);
       m_mergeLivox = create_publisher<livox_ros_driver2::msg::CustomMsg>(
           "/livox/lidar", 5);
+      m_showMergeLivox = create_publisher<sensor_msgs::msg::PointCloud2>(
+          "/livox/lidar_pc2", 5);
     }
 
   } else if (1 == mode) {

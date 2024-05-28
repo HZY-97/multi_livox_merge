@@ -4,6 +4,7 @@
 #pragma once
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_cloud.h>
+#include <pcl_conversions/pcl_conversions.h>
 
 #include <atomic>
 #include <deque>
@@ -23,7 +24,6 @@ class LidarMerge {
 
  private:
   bool SyncCloud();
-  uint8_t CheckTime(double time_0_ms, double time_1_ms);
 
   void PubMeergeCloud();
 
