@@ -32,7 +32,6 @@ void LidarMerge::MergeCloud() {
     // LOG(WARNING) << "Sync Fail!";
     return;
   }
-  PubMeergeCloud();
 #ifdef SHOW_TIME
   /*calculate time*/
   static bool isFirst = true;
@@ -49,6 +48,9 @@ void LidarMerge::MergeCloud() {
   m_lastTime = m_currentTime;
 /*calculate time*/
 #endif
+
+  PubMeergeCloud();
+
   LOG(INFO) << "Publish Success!";
 }
 
@@ -73,6 +75,13 @@ bool LidarMerge::SyncCloud() {
       m_dataManager->m_caliData_0_deq.pop_front();
       m_dataManager->m_caliData_1_deq.pop_front();
       return true;
+    } else if (std::abs(time_diff) > 1000.0) {
+      // reset cloud
+      LOG(WARNING) << "time diff is too big...Reset!!";
+      tmp_cloud_0_ptr.reset();
+      tmp_cloud_1_ptr.reset();
+      m_dataManager->m_caliData_0_deq.clear();
+      m_dataManager->m_caliData_1_deq.clear();
     } else {
       if (time_diff > 0) {
         LOG(ERROR) << "id:1 is old wait...";
@@ -121,6 +130,15 @@ void LidarMerge::PubMeergeCloud() {
                         ->m_topicManagerPtr->m_showMergeLivox;
     sensor_msgs::msg::PointCloud2 tmpCloud;
 
+    if (pcl_full_cloud->empty()) {
+      for (size_t i = 0; i < full_cloud_ptr->points.size(); i++) {
+        pcl_full_cloud->points.push_back(pcl::PointXYZI(
+            full_cloud_ptr->points[i].x, full_cloud_ptr->points[i].y,
+            full_cloud_ptr->points[i].z,
+            full_cloud_ptr->points[i].reflectivity));
+      }
+    }
+
     pcl::toROSMsg(*pcl_full_cloud, tmpCloud);
     tmpCloud.header.frame_id = "map";
     pub_show->publish(tmpCloud);
@@ -132,7 +150,7 @@ void LidarMerge::PubMeergeCloud() {
   cloud_0_ptr.reset();
   cloud_1_ptr.reset();
   auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double, std::milli> duration = start - end;
+  std::chrono::duration<double, std::milli> duration = end - start;
   LOG(INFO) << "PubMeergeCloud use time= " << duration.count();
 }
 

@@ -39,8 +39,6 @@ class LidarMerge {
   livox_ros_driver2::msg::CustomMsg::SharedPtr tmp_cloud_0_ptr;
   livox_ros_driver2::msg::CustomMsg::SharedPtr tmp_cloud_1_ptr;
 
-  std::atomic<bool> is_sync;
-
 #ifdef SHOW_TIME
   std::chrono::system_clock::time_point m_lastTime;
   std::chrono::system_clock::time_point m_currentTime;

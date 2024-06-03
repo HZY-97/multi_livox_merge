@@ -16,6 +16,14 @@ echo $MULTI_LIVOX_MERGE_INSTALL_PATH
 
 Rviz2_process=false
 
+readonly USE_RVIZ2="rviz"
+
+if [ $# -eq 1 ] && [ "$1" == "rviz" ]; then
+    Rviz2_process=true
+else
+    Rviz2_process=false
+fi
+
 # every process wait time 0.2s
 wait_time=0.2s
 

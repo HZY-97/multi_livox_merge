@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   google::InstallFailureSignalHandler();
   FLAGS_logtostderr = true;
-  //   FLAGS_minloglevel = google::FATAL;
+  // FLAGS_minloglevel = google::FATAL;
   FLAGS_logbufsecs = 0;
   FLAGS_colorlogtostderr = true;
   LOG(INFO) << "multi_livox_merge Log Init Success!";
@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
         } else {
           LOG_EVERY_N(INFO, 50) << "Waiting for calculation...";
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
       }
     });
 
@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     std::thread t = std::thread([&]() {
       while (true) {
         node_manager_ptr->m_mergePtr->MergeCloud();
-        // std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
       }
     });
 

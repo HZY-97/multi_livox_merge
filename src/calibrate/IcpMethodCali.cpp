@@ -52,8 +52,6 @@ Result IcpMethodCali::Exectute() {
     return r;
   }
 
-  FindCoView(source_cloud, target_cloud);
-
   source_cloud = TransformPointCloud(source_cloud, m_lastResult);
 
   // 创建ICP对象
@@ -157,93 +155,6 @@ void IcpMethodCali::SyncCloud(
   });
   t0.join();
   t1.join();
-}
-
-/**
- * @brief
- * 1.源点云进树,遍历目标点云画圈搜索
- * 2.所有的索引合并去重
- * 3.根据索引将源点云过滤
- * 4.目标点云进树,过滤后源点云遍历搜索
- * 5.所有的索引合并去重
- * 6.根据索引将目标点云过滤
- *
- * @param source_cloud
- * @param target_cloud
- */
-void IcpMethodCali::FindCoView(
-    pcl::PointCloud<pcl::PointXYZI>::Ptr source_cloud,
-    pcl::PointCloud<pcl::PointXYZI>::Ptr target_cloud) {
-  pcl::PointCloud<pcl::PointXYZI>::Ptr source_cloud_filtered(
-      new pcl::PointCloud<pcl::PointXYZI>);
-  pcl::PointCloud<pcl::PointXYZI>::Ptr target_cloud_filtered(
-      new pcl::PointCloud<pcl::PointXYZI>);
-
-  pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr s_kdtree(
-      new pcl::KdTreeFLANN<pcl::PointXYZI>);
-  pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr t_kdtree(
-      new pcl::KdTreeFLANN<pcl::PointXYZI>);
-
-  std::vector<int> s_idx_total_vec;
-  std::vector<int> t_idx_total_vec;
-
-  std::mutex s_idx_total_vec_mtx;
-  std::mutex t_idx_total_vec_mtx;
-
-  std::thread s_t;
-  std::thread t_t;
-
-  double radius = 0.1;
-
-  s_t = std::thread([&]() {
-    s_kdtree->setInputCloud(source_cloud);
-#pragma omp parallel for num_threads(8)
-    for (size_t i = 0; i < target_cloud->size(); i++) {
-      std::vector<int> s_idx_vec(source_cloud->size());
-      std::vector<float> s_distance_vec(source_cloud->size());
-      s_kdtree->radiusSearch(target_cloud->points[i], radius, s_idx_vec,
-                             s_distance_vec);
-
-      std::lock_guard<std::mutex> lock_s(s_idx_total_vec_mtx);
-      std::copy(s_idx_vec.begin(), s_idx_vec.end(),
-                std::back_inserter(s_idx_total_vec));
-    }
-    std::sort(s_idx_total_vec.begin(), s_idx_total_vec.end());
-    auto it = std::unique(s_idx_total_vec.begin(), s_idx_total_vec.end());
-    s_idx_total_vec.erase(it, s_idx_total_vec.end());
-    for (size_t i = 0; i < s_idx_total_vec.size(); i++) {
-      source_cloud_filtered->push_back(
-          source_cloud->points[s_idx_total_vec[i]]);
-    }
-    source_cloud = source_cloud_filtered;
-  });
-
-  t_t = std::thread([&]() {
-    t_kdtree->setInputCloud(target_cloud);
-#pragma omp parallel for num_threads(8)
-    for (size_t i = 0; i < source_cloud->size(); i++) {
-      std::vector<int> t_idx_vec(target_cloud->size());
-      std::vector<float> t_distance_vec(target_cloud->size());
-      t_kdtree->radiusSearch(source_cloud->points[i], radius, t_idx_vec,
-                             t_distance_vec);
-
-      std::lock_guard<std::mutex> lock_t(t_idx_total_vec_mtx);
-      std::copy(t_idx_vec.begin(), t_idx_vec.end(),
-                std::back_inserter(t_idx_total_vec));
-    }
-    std::sort(t_idx_total_vec.begin(), t_idx_total_vec.end());
-    auto it = std::unique(t_idx_total_vec.begin(), t_idx_total_vec.end());
-    t_idx_total_vec.erase(it, t_idx_total_vec.end());
-
-    for (size_t i = 0; i < t_idx_total_vec.size(); i++) {
-      target_cloud_filtered->push_back(
-          target_cloud->points[t_idx_total_vec[i]]);
-    }
-    target_cloud = target_cloud_filtered;
-  });
-
-  s_t.join();
-  t_t.join();
 }
 
 uint8_t IcpMethodCali::CheckHeader(std_msgs::msg::Header header_0,

@@ -65,7 +65,7 @@ class QosConfig {
   //       rclcpp::QoS(rclcpp::QoSInitialization(qos_profile_lidar.history,
   //                                             qos_profile_lidar.depth),
   //                   qos_profile_lidar);
-  rclcpp::QoS qos_lidar = rclcpp::QoS(5);
+  rclcpp::QoS qos_lidar = rclcpp::QoS(1);
 };
 }  // namespace common::qos
 
