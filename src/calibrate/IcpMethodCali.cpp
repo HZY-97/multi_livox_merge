@@ -32,12 +32,16 @@ IcpMethodCali::IcpMethodCali() {
   m_lastResult.pitch = lidar_info_vec[1].pitch * M_PI / 180.0f;
   m_lastResult.yaw = lidar_info_vec[1].yaw * M_PI / 180.0f;
   LOG(WARNING) << "INIT GUSS = " << m_lastResult.ShowResult();
+
+  m_source_cloud.reset(new pcl::PointCloud<pcl::PointXYZI>);
+  m_target_cloud.reset(new pcl::PointCloud<pcl::PointXYZI>);
 }
 
 IcpMethodCali::~IcpMethodCali() {
 }
 
 Result IcpMethodCali::Exectute() {
+  static int cache_pcd_nums = 0;
   Result r;
 
   // 加载源点云和目标点云
@@ -54,10 +58,20 @@ Result IcpMethodCali::Exectute() {
 
   source_cloud = TransformPointCloud(source_cloud, m_lastResult);
 
+  m_source_cloud->insert(m_source_cloud->end(), source_cloud->begin(),
+                         source_cloud->end());
+  m_target_cloud->insert(m_target_cloud->end(), target_cloud->begin(),
+                         target_cloud->end());
+  cache_pcd_nums += 1;
+
+  if (cache_pcd_nums < paramLoad::LivoxConfig::GetInstance()->cache_pcd_nums) {
+    return r;
+  }
+
   // 创建ICP对象
   pcl::IterativeClosestPoint<pcl::PointXYZI, pcl::PointXYZI> icp;
-  icp.setInputSource(source_cloud);
-  icp.setInputTarget(target_cloud);
+  icp.setInputSource(m_source_cloud);
+  icp.setInputTarget(m_target_cloud);
 
   // 设置ICP参数
   icp.setMaxCorrespondenceDistance(0.1);  // 最大对应距离
@@ -86,11 +100,11 @@ Result IcpMethodCali::Exectute() {
       system(command.c_str());
       pcl::io::savePCDFileASCII(
           save_times_pcd + "/" + std::to_string(times) + "_source.pcd",
-          *source_cloud);
+          *m_source_cloud);
       pcl::io::savePCDFileASCII(
           save_times_pcd + "/" + std::to_string(times) + "_target.pcd",
-          *target_cloud);
-      *transformed_source = *target_cloud + *transformed_source;
+          *m_target_cloud);
+      *transformed_source = *m_target_cloud + *transformed_source;
       pcl::io::savePCDFileASCII(
           save_times_pcd + "/" + std::to_string(times) + ".pcd",
           *transformed_source);
@@ -107,6 +121,10 @@ Result IcpMethodCali::Exectute() {
   } else {
     LOG(WARNING) << "The point cloud calculation failed for this frame";
   }
+
+  m_source_cloud.reset(new pcl::PointCloud<pcl::PointXYZI>);
+  m_target_cloud.reset(new pcl::PointCloud<pcl::PointXYZI>);
+  cache_pcd_nums = 0;
   return r;
 }
 

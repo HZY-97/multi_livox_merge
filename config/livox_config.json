@@ -1,5 +1,6 @@
 {
     "save_pcd": false,
+    "cache_pcd_nums": 20,
     "working_mode": {
         "commant": "0:merge point cloud; 1:Calibrate all data to laserId 0 ",
         "mode": 0

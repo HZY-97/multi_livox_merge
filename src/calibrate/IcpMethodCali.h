@@ -41,6 +41,9 @@ class IcpMethodCali : public CalibrateBase {
  public:
  private:
   Result m_lastResult;
+
+  pcl::PointCloud<pcl::PointXYZI>::Ptr m_source_cloud;
+  pcl::PointCloud<pcl::PointXYZI>::Ptr m_target_cloud;
 };
 }  // namespace calibrate
 #endif

@@ -93,6 +93,7 @@ void LivoxConfig::LoadConfig() {
               });
 
     save_pcd = livox_config_json["save_pcd"].get<bool>();
+    cache_pcd_nums = livox_config_json["cache_pcd_nums"].get<int>();
 
   } catch (const nlohmann::json::exception& e) {
     std::cerr << "\033[31m" << e.what() << "\033[0m" << '\n';
