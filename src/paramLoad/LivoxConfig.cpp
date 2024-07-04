@@ -94,6 +94,8 @@ void LivoxConfig::LoadConfig() {
 
     save_pcd = livox_config_json["save_pcd"].get<bool>();
     cache_pcd_nums = livox_config_json["cache_pcd_nums"].get<int>();
+    intensity_min = livox_config_json["intensity_min"].get<int>();
+    is_each_conversion = livox_config_json["is_each_conversion"].get<bool>();
 
   } catch (const nlohmann::json::exception& e) {
     std::cerr << "\033[31m" << e.what() << "\033[0m" << '\n';

@@ -43,6 +43,8 @@ class LivoxConfig final {
  public:
   int mode;
   int cache_pcd_nums;
+  int intensity_min;
+  bool is_each_conversion;
   vector<int> use_lidar_id;
   vector<int> use_imu_id;
   vector<Common::Type::LivoxInfo> m_livoxInfoVec;

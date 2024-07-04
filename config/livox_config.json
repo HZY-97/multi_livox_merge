@@ -1,9 +1,11 @@
 {
     "save_pcd": false,
     "cache_pcd_nums": 20,
+    "intensity_min": 0,
+    "is_each_conversion": true,
     "working_mode": {
         "commant": "0:merge point cloud; 1:Calibrate all data to laserId 0 ",
-        "mode": 0
+        "mode": 1
     },
     "use_lidar_id": [
         0,

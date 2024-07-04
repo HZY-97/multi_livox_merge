@@ -38,6 +38,9 @@ class IcpMethodCali : public CalibrateBase {
   uint8_t CheckHeader(std_msgs::msg::Header header_0,
                       std_msgs::msg::Header header_1);
 
+  void GetIntensityCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr source_cloud,
+                         pcl::PointCloud<pcl::PointXYZI>::Ptr target_cloud);
+
  public:
  private:
   Result m_lastResult;

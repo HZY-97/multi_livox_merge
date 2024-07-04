@@ -14,6 +14,7 @@
 #include <pcl/kdtree/kdtree_flann.h>
 
 #include <algorithm>
+#include <cstddef>
 #include <mutex>
 #include <pcl/impl/point_types.hpp>
 #include <string>
@@ -56,7 +57,11 @@ Result IcpMethodCali::Exectute() {
     return r;
   }
 
-  source_cloud = TransformPointCloud(source_cloud, m_lastResult);
+  GetIntensityCloud(source_cloud, target_cloud);
+
+  if (paramLoad::LivoxConfig::GetInstance()->is_each_conversion) {
+    source_cloud = TransformPointCloud(source_cloud, m_lastResult);
+  }
 
   m_source_cloud->insert(m_source_cloud->end(), source_cloud->begin(),
                          source_cloud->end());
@@ -189,6 +194,35 @@ uint8_t IcpMethodCali::CheckHeader(std_msgs::msg::Header header_0,
   } else {
     return 100;
   }
+}
+
+void IcpMethodCali::GetIntensityCloud(
+    pcl::PointCloud<pcl::PointXYZI>::Ptr source_cloud,
+    pcl::PointCloud<pcl::PointXYZI>::Ptr target_cloud) {
+  pcl::PointCloud<pcl::PointXYZI>::Ptr source_cloud_intensity(
+      new pcl::PointCloud<pcl::PointXYZI>);
+  pcl::PointCloud<pcl::PointXYZI>::Ptr target_cloud_intensity(
+      new pcl::PointCloud<pcl::PointXYZI>);
+
+  for (size_t i = 0; i < source_cloud->size(); i++) {
+    if (source_cloud->points[i].intensity <
+        paramLoad::LivoxConfig::GetInstance()->intensity_min) {
+      continue;
+    } else {
+      source_cloud_intensity->push_back(source_cloud->points[i]);
+    }
+  }
+  for (size_t i = 0; i < target_cloud->size(); i++) {
+    if (target_cloud->points[i].intensity <
+        paramLoad::LivoxConfig::GetInstance()->intensity_min) {
+      continue;
+    } else {
+      target_cloud_intensity->push_back(target_cloud->points[i]);
+    }
+  }
+
+  source_cloud = source_cloud_intensity;
+  target_cloud = target_cloud_intensity;
 }
 
 }  // namespace calibrate
