@@ -5,7 +5,7 @@
     "is_each_conversion": true,
     "working_mode": {
         "commant": "0:merge point cloud; 1:Calibrate all data to laserId 0 ",
-        "mode": 1
+        "mode": 0
     },
     "use_lidar_id": [
         0,

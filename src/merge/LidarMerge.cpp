@@ -4,6 +4,7 @@
 #include <pcl/io/pcd_io.h>
 
 #include <pcl/impl/point_types.hpp>
+#include <rclcpp/time.hpp>
 
 #include "manager/NodeManager.h"
 
@@ -108,7 +109,9 @@ void LidarMerge::PubMeergeCloud() {
   full_cloud_ptr->points.insert(full_cloud_ptr->points.end(),
                                 cloud_1_ptr->points.begin(),
                                 cloud_1_ptr->points.end());
-  LOG(INFO) << "full_cloud_ptr size= " << full_cloud_ptr->points.size();
+  full_cloud_ptr->point_num = full_cloud_ptr->points.size();
+  // LOG(INFO) << "full_cloud_ptr size= " << full_cloud_ptr->points.size();
+  LOG(INFO) << "full_cloud_ptr->point_num= " << full_cloud_ptr->point_num;
 
   manager::NodeManager::GetInstance()->m_topicManagerPtr->m_mergeLivox->publish(
       *full_cloud_ptr);
